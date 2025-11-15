@@ -1,17 +1,26 @@
 import 'dotenv/config';
-import {PrismaClient} from "@prisma/client";
-import {PrismaNeon} from "@prisma/adapter-neon";
-import { neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
+import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 
+// WebSocket support for Neon
 neonConfig.webSocketConstructor = ws;
 
-const connectionString = `${process.env.DATABASE_URL}`;
+// Let Neon parse the connection string internally
+neonConfig.connectionString = process.env.DATABASE_URL;
 
-const adapter = new PrismaNeon(connectionString);
+// Create adapter WITHOUT passing the URL
+const adapter = new PrismaNeon();
 
-const prisma = global.prisma || new PrismaClient({adapter});
+// Normal Prisma client + adapter
+const prisma = global.prisma || new PrismaClient({
+  adapter
+});
 
-if (process.env.NODE_ENV === 'development') global.prisma = prisma;
+// Keep prisma global in dev
+if (process.env.NODE_ENV === "development") {
+  global.prisma = prisma;
+}
 
 export default prisma;
