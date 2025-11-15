@@ -9,6 +9,7 @@ const syncUserCreation = inngest.createFunction(
     {event: 'clerk/user.created'},
     async ({event}) => {
       const {data} = event;
+      try {
       await prisma.user.create({
         data: {
           id: data.id,
@@ -17,6 +18,10 @@ const syncUserCreation = inngest.createFunction(
           image: data?.image_url,
         }
       })
+      }catch (error) {
+         console.error('Prisma error in syncUserCreation:', error);
+        throw error; // rethrow so Inngest shows failure
+      }
     }
 )
 
@@ -26,11 +31,16 @@ const syncUserDeletion = inngest.createFunction(
     {event: 'clerk/user.deleted'},
     async ({event}) => {
       const {data} = event;
+      try {
       await prisma.user.delete({
         where :{
             id: data.id
         }
       })
+      }catch (error) {
+         console.error('Prisma error in syncUserDeletion:', error);
+        throw error; // rethrow so Inngest shows failure
+      }
     }
 )
 
@@ -41,6 +51,7 @@ const syncUserUpdation= inngest.createFunction(
     {event: 'clerk/user.updated'},
     async ({event}) => {
       const {data} = event;
+      try {
       await prisma.user.update({
         where:{
             id:data.id
@@ -51,6 +62,10 @@ const syncUserUpdation= inngest.createFunction(
             image:data?.image_url,
         }
       })
+      }catch (error) {
+         console.error('Prisma error in syncUserUpdation:', error);
+        throw error; // rethrow so Inngest shows failure
+      }
     }
 )
     
